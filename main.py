@@ -5,6 +5,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from datetime import datetime, timedelta
 
+# Ultima semana del curso con clases, o eventos a guardar
+texto_final = 'Abr 29 – May 5, 2024' 
+
 meses_abreviados = {
     'Ene': 'Jan',
     'Feb': 'Feb',
@@ -61,7 +64,6 @@ def append_table_to_txt(driver):
             for c in clases:
                 file.write(f'{c}\n')
 
-
         print(f"Datos de la semana del {lun_date} añadidos al archivo {output_file}")
 
     except Exception as e:
@@ -82,9 +84,6 @@ def descargar():
     wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/p/a'))).click()
     
     driver.get(url)
-    
-    # Ultima semana del curso con clases, o eventos a guardar
-    texto_final = 'Abr 29 – May 5, 2024' 
 
     texto_actual = ''
     while texto_actual != texto_final:
