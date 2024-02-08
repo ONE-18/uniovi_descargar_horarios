@@ -24,11 +24,18 @@ meses_abreviados = {
     'Dic': 'Dec',
 }
 
-def fill_credentials(driver, wait):
+def fill_credentials(wait):
     
+    sleep(1)
     campo_usuario = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="i0116"]')))
     campo_usuario.clear()
     campo_usuario.send_keys(credentials()['user'])
+    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="idSIButton9"]'))).click()
+    
+    sleep(1)
+    campo_passw = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="i0118"]')))
+    campo_passw.clear()
+    campo_passw.send_keys(credentials()['password'])
     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="idSIButton9"]'))).click()
     
 def append_table_to_txt(driver):
@@ -86,21 +93,19 @@ def descargar():
     options = webdriver.ChromeOptions()
     options.add_experimental_option('detach', False)
     driver = webdriver.Chrome(options=options)
-    wait = WebDriverWait(driver, 100)
+    wait = WebDriverWait(driver, 10)
     
     driver.get(url)
     
     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="ContenedorProviders"]/div[1]/span/div'))).click()
     
-    fill_credentials(driver, wait)
+    fill_credentials(wait)
     
     wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/p/a'))).click()
     
     driver.get(url)
-    
-    wait = WebDriverWait(driver, 10)
-    
-    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[2]/div/button[1]'))).click()
+        
+    # wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[2]/div/button[1]'))).click()
 
     print("Descargando...")
     texto_actual = ''
