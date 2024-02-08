@@ -7,22 +7,7 @@ from datetime import datetime, timedelta
 from os import path, remove
 
 # Ultima semana del curso con clases, o eventos a guardar
-texto_final = 'Abr 29 – May 5, 2024' 
-
-meses_abreviados = {
-    'Ene': 'Jan',
-    'Feb': 'Feb',
-    'Mar': 'Mar',
-    'Abr': 'Apr',
-    'May': 'May',
-    'Jun': 'Jun',
-    'Jul': 'Jul',
-    'Ago': 'Aug',
-    'Sep': 'Sep',
-    'Oct': 'Oct',
-    'Nov': 'Nov',
-    'Dic': 'Dec',
-}
+texto_final = 'Junio 2024' 
 
 def fill_credentials(wait):
     
@@ -47,15 +32,15 @@ def append_table_to_txt(driver):
         days_n = []
         
         days = driver.find_elements(By.CSS_SELECTOR, "[class*='fc-day']")
-        
         for day in days:
-            # print(day_head.get_attribute('data-date'))
             days_n.append(day.get_attribute('data-date')) if day.get_attribute('data-date') not  in days_n else None
-                
-        for day in days_n:
-            print(day)
         
-        pass
+        clases = driver.find_elements(By.CSS_SELECTOR, "[class*='fc-event-container']")
+        for clase in clases:
+            clase.click()
+            popup = driver.find_element(By.CSS_SELECTOR,"[class*='ui-dialog']")
+            print(popup.text)
+        
         
         # # Lunes
         # clases.append(f"Lunes {fecha_completa.strftime('%d/%m/%Y')}")
