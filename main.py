@@ -40,46 +40,54 @@ def fill_credentials(wait):
     
 def append_table_to_txt(driver):
     output_file = 'horario.txt'
-    lun_date = driver.find_element(By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2').text
-    lun_date = lun_date.split('–')[0].strip()
-    mes_abreviado = meses_abreviados.get(lun_date[:3])
-    fecha_completa = datetime.strptime(f"{mes_abreviado} {lun_date[4:]} 2024", "%b %d %Y")
+    month_date = driver.find_element(By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2').text
+    
     try:
-
-        table = driver.find_elements(By.CLASS_NAME, 'fc-event-container')
         clases = []
+        days_n = []
         
-        # Lunes
-        clases.append(f"Lunes {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[1].text + '\n')
+        days = driver.find_elements(By.CSS_SELECTOR, "[class*='fc-day']")
         
-        # Martes
-        fecha_completa = fecha_completa + timedelta(days=1)
-        clases.append(f"Martes {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[3].text + '\n')
+        for day in days:
+            # print(day_head.get_attribute('data-date'))
+            days_n.append(day.get_attribute('data-date')) if day.get_attribute('data-date') not  in days_n else None
+                
+        for day in days_n:
+            print(day)
+        
+        pass
+        
+        # # Lunes
+        # clases.append(f"Lunes {fecha_completa.strftime('%d/%m/%Y')}")
+        # clases.append(table[1].text + '\n')
+        
+        # # Martes
+        # fecha_completa = fecha_completa + timedelta(days=1)
+        # clases.append(f"Martes {fecha_completa.strftime('%d/%m/%Y')}")
+        # clases.append(table[3].text + '\n')
 
-        # Miercoles
-        fecha_completa = fecha_completa + timedelta(days=1)
-        clases.append(f"Miercoles {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[5].text + '\n')
+        # # Miercoles
+        # fecha_completa = fecha_completa + timedelta(days=1)
+        # clases.append(f"Miercoles {fecha_completa.strftime('%d/%m/%Y')}")
+        # clases.append(table[5].text + '\n')
         
-        # Jueves
-        fecha_completa = fecha_completa + timedelta(days=1)
-        clases.append(f"Jueves {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[7].text + '\n')
+        # # Jueves
+        # fecha_completa = fecha_completa + timedelta(days=1)
+        # clases.append(f"Jueves {fecha_completa.strftime('%d/%m/%Y')}")
+        # clases.append(table[7].text + '\n')
         
-        # Viernes
-        fecha_completa = fecha_completa + timedelta(days=1)
-        clases.append(f"Viernes {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[9].text + '\n')
+        # # Viernes
+        # fecha_completa = fecha_completa + timedelta(days=1)
+        # clases.append(f"Viernes {fecha_completa.strftime('%d/%m/%Y')}")
+        # clases.append(table[9].text + '\n')
 
-        # Añadir los datos al archivo de texto
-        with open(output_file, 'a', encoding='utf-8') as file:
-            # file.write(f'{fecha_completa.strftime("%d/%m/%Y")}\n')
-            for c in clases:
-                file.write(f'{c}\n')
+        # # Añadir los datos al archivo de texto
+        # with open(output_file, 'a', encoding='utf-8') as file:
+        #     # file.write(f'{fecha_completa.strftime("%d/%m/%Y")}\n')
+        #     for c in clases:
+        #         file.write(f'{c}\n')
 
-        print(f"Datos de la semana del {lun_date} añadidos al archivo {output_file}")
+        # print(f"Datos de la semana del {lun_date} añadidos al archivo {output_file}")
 
     except Exception as e:
         print(f"Error: {e}")
@@ -103,7 +111,7 @@ def descargar():
     driver.get(url)
         
     # Change to the month view
-    # wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[2]/div/button[1]'))).click()
+    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[2]/div/button[1]'))).click()
 
     if path.exists('horario.txt'):
         remove('horario.txt')
