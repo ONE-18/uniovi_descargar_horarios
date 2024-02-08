@@ -87,9 +87,6 @@ def append_table_to_txt(driver):
 def descargar():
     url = "https://sies.uniovi.es/serviciosacademicos/web/expedientes/calendario.faces"
     
-    if path.exists('horario.txt'):
-        remove('horario.txt')
-    
     options = webdriver.ChromeOptions()
     options.add_experimental_option('detach', False)
     driver = webdriver.Chrome(options=options)
@@ -105,8 +102,12 @@ def descargar():
     
     driver.get(url)
         
+    # Change to the month view
     # wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[2]/div/button[1]'))).click()
 
+    if path.exists('horario.txt'):
+        remove('horario.txt')
+    
     print("Descargando...")
     texto_actual = ''
     while texto_actual != texto_final:
