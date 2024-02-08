@@ -23,7 +23,14 @@ meses_abreviados = {
     'Nov': 'Nov',
     'Dic': 'Dec',
 }
-   
+
+def fill_credentials(driver, wait):
+    
+    campo_usuario = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="i0116"]')))
+    campo_usuario.clear()
+    campo_usuario.send_keys(credentials()['user'])
+    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="idSIButton9"]'))).click()
+    
 def append_table_to_txt(driver):
     output_file = 'horario.txt'
     lun_date = driver.find_element(By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2').text
@@ -84,11 +91,16 @@ def descargar():
     driver.get(url)
     
     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="ContenedorProviders"]/div[1]/span/div'))).click()
+    
+    fill_credentials(driver, wait)
+    
     wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/p/a'))).click()
     
     driver.get(url)
     
     wait = WebDriverWait(driver, 10)
+    
+    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[2]/div/button[1]'))).click()
 
     print("Descargando...")
     texto_actual = ''
@@ -97,7 +109,19 @@ def descargar():
         sleep(1)
         append_table_to_txt(driver)
         wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[1]/div/button[2]'))).click()
-        
+
+def credentials():
+    ret = {}
+    if path.exists('credentials'):
+        with open('credentials', 'r') as file:
+            lines = file.readlines()
+            ret['user'] = lines[0].split('=')[1].strip()
+            ret['password'] = lines[1].split('=')[1].strip()
+        return ret
+    else:
+        print("No se ha encontrado el archivo 'credentials'\nCreandolo...")
+        with open('credentials', 'w') as file:
+            file.write("user=\npassword=\n")
 
 if __name__ == '__main__':
     try:
