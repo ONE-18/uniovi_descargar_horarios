@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from datetime import datetime, timedelta
+from os import path, remove
 
 # Ultima semana del curso con clases, o eventos a guardar
 texto_final = 'Abr 29 – May 5, 2024' 
@@ -25,7 +26,7 @@ meses_abreviados = {
    
 def append_table_to_txt(driver):
     output_file = 'horario.txt'
-    lun_date = driver.find_element(By.XPATH, '//*[@id="j_id_6z:j_id_7c_container"]/div[1]/div[3]').text
+    lun_date = driver.find_element(By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2').text
     lun_date = lun_date.split('–')[0].strip()
     mes_abreviado = meses_abreviados.get(lun_date[:3])
     fecha_completa = datetime.strptime(f"{mes_abreviado} {lun_date[4:]} 2024", "%b %d %Y")
@@ -59,7 +60,7 @@ def append_table_to_txt(driver):
         clases.append(table[9].text + '\n')
 
         # Añadir los datos al archivo de texto
-        with open(output_file, 'a') as file:
+        with open(output_file, 'a', encoding='utf-8') as file:
             # file.write(f'{fecha_completa.strftime("%d/%m/%Y")}\n')
             for c in clases:
                 file.write(f'{c}\n')
@@ -71,7 +72,9 @@ def append_table_to_txt(driver):
 
 def descargar():
     url = "https://sies.uniovi.es/serviciosacademicos/web/expedientes/calendario.faces"
-    print("Descargando...")
+    
+    if path.exists('horario.txt'):
+        remove('horario.txt')
     
     options = webdriver.ChromeOptions()
     options.add_experimental_option('detach', False)
@@ -84,14 +87,21 @@ def descargar():
     wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/p/a'))).click()
     
     driver.get(url)
+    
+    wait = WebDriverWait(driver, 10)
 
+    print("Descargando...")
     texto_actual = ''
     while texto_actual != texto_final:
-        texto_actual = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_6z:j_id_7c_container"]/div[1]/div[3]'))).text
+        texto_actual = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2'))).text
         sleep(1)
         append_table_to_txt(driver)
-        wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_6z:j_id_7c_container"]/div[1]/div[1]/div/button[2]'))).click()
+        wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[1]/div/button[2]'))).click()
         
 
 if __name__ == '__main__':
-    descargar()
+    try:
+        descargar()
+    except Exception as e:
+        print(f"Error: {e}")
+        
