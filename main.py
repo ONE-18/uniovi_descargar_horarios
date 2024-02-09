@@ -20,6 +20,8 @@ def fill_credentials(wait):
     campo_passw.send_keys(credentials()['password'])
     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="idSIButton9"]'))).click()
     
+    wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/p/a')))
+    
 def append_table_to_txt(wait):
     output_file = 'horario.txt'
     lun_date = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2'))).text
@@ -48,7 +50,7 @@ def append_table_to_txt(wait):
         print(f"Datos de la semana del {lun_date} añadidos al archivo {output_file}")
 
     except Exception as e:
-        print(f"Error en la semana del {lun_date}:\n{e}")
+        print(f"Error en la semana del {lun_date}:")
 
 def descargar():
     url = "https://sies.uniovi.es/serviciosacademicos/web/expedientes/calendario.faces"
@@ -64,7 +66,7 @@ def descargar():
     
     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="ContenedorProviders"]/div[1]/span/div'))).click()
     
-    fill_credentials(wait)
+    fill_credentials(WebDriverWait(driver, 100))
     
     wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/p/a'))).click()
     
@@ -84,7 +86,7 @@ def descargar():
         append_table_to_txt(wait)
         wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[1]/div/button[2]'))).click()
 
-def credentials():
+def credentials():      # TODO: comprobar que los datos son validos
     ret = {}
     if path.exists('credentials'):
         with open('credentials', 'r', encoding='utf-8') as file:
