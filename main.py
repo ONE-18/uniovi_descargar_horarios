@@ -6,24 +6,6 @@ from time import sleep
 from datetime import datetime, timedelta
 from os import path, remove
 
-# Ultima semana del curso con clases, o eventos a guardar
-texto_final = 'Abr 29 – May 5, 2024' 
-
-meses_abreviados = {
-    'Ene': 'Jan',
-    'Feb': 'Feb',
-    'Mar': 'Mar',
-    'Abr': 'Apr',
-    'May': 'May',
-    'Jun': 'Jun',
-    'Jul': 'Jul',
-    'Ago': 'Aug',
-    'Sep': 'Sep',
-    'Oct': 'Oct',
-    'Nov': 'Nov',
-    'Dic': 'Dec',
-}
-
 def fill_credentials(wait):
     
     sleep(1)
@@ -42,8 +24,6 @@ def append_table_to_txt(wait):
     output_file = 'horario.txt'
     lun_date = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2'))).text
     lun_date = lun_date.split('–')[0].strip()
-    mes_abreviado = meses_abreviados.get(lun_date[:3])
-    fecha_completa = datetime.strptime(f"{mes_abreviado} {lun_date[4:]} 2024", "%b %d %Y")
     try:
         Clases = []
         clases = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[class*='fc-title']")))
@@ -56,7 +36,7 @@ def append_table_to_txt(wait):
                 wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:addButton"]'))).click()
                 sleep(0.2)
                 Clases.append(Clase(text))
-                print(Clases[-1])
+                # print(Clases[-1])
                 
 
         # Añadir los datos al archivo de texto
@@ -68,11 +48,12 @@ def append_table_to_txt(wait):
         print(f"Datos de la semana del {lun_date} añadidos al archivo {output_file}")
 
     except Exception as e:
-        print(f"Error: {e}")
-        pass
+        print(f"Error en la semana del {lun_date}:\n{e}")
 
 def descargar():
     url = "https://sies.uniovi.es/serviciosacademicos/web/expedientes/calendario.faces"
+    # Ultima semana del curso con clases, o eventos a guardar
+    texto_final = credentials()['last_week']
     
     options = webdriver.ChromeOptions()
     options.add_experimental_option('detach', False)
@@ -106,15 +87,18 @@ def descargar():
 def credentials():
     ret = {}
     if path.exists('credentials'):
-        with open('credentials', 'r') as file:
+        with open('credentials', 'r', encoding='utf-8') as file:
             lines = file.readlines()
             ret['user'] = lines[0].split('=')[1].strip()
             ret['password'] = lines[1].split('=')[1].strip()
+            ret['last_week'] = lines[2].split('=')[1].strip()
         return ret
     else:
         print("No se ha encontrado el archivo 'credentials'\nCreandolo...")
-        with open('credentials', 'w') as file:
-            file.write("user=\npassword=\n")
+        with open('credentials', 'w', encoding='utf-8') as file:
+            file.write("user=\npassword=\nlast_week=")
+        input("Introduce tu usuario y contraseña de la Universidad de Oviedo en el archivo credentials\nPulsa Enter para continuar...")
+        exit()
 
 class Clase:
     def __init__(self, fecha, hora_ini, hora_fin, aula, asignatura, clase_tipo):

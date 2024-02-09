@@ -1,2 +1,4 @@
 *.txt
 credentials
+/build
+*.spec
