@@ -38,51 +38,38 @@ def fill_credentials(wait):
     campo_passw.send_keys(credentials()['password'])
     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="idSIButton9"]'))).click()
     
-def append_table_to_txt(driver):
+def append_table_to_txt(wait):
     output_file = 'horario.txt'
-    lun_date = driver.find_element(By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2').text
+    lun_date = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2'))).text
     lun_date = lun_date.split('–')[0].strip()
     mes_abreviado = meses_abreviados.get(lun_date[:3])
     fecha_completa = datetime.strptime(f"{mes_abreviado} {lun_date[4:]} 2024", "%b %d %Y")
     try:
-
-        table = driver.find_elements(By.CLASS_NAME, 'fc-event-container')
-        clases = []
+        Clases = []
+        clases = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[class*='fc-title']")))
         
-        # Lunes
-        clases.append(f"Lunes {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[1].text + '\n')
-        
-        # Martes
-        fecha_completa = fecha_completa + timedelta(days=1)
-        clases.append(f"Martes {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[3].text + '\n')
-
-        # Miercoles
-        fecha_completa = fecha_completa + timedelta(days=1)
-        clases.append(f"Miercoles {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[5].text + '\n')
-        
-        # Jueves
-        fecha_completa = fecha_completa + timedelta(days=1)
-        clases.append(f"Jueves {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[7].text + '\n')
-        
-        # Viernes
-        fecha_completa = fecha_completa + timedelta(days=1)
-        clases.append(f"Viernes {fecha_completa.strftime('%d/%m/%Y')}")
-        clases.append(table[9].text + '\n')
+        for clase in clases:
+            if clase.text != '':
+                clase.click()
+                sleep(0.2)
+                text = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR,"[class*='ui-dialog']"))).text.split('\n')
+                wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:addButton"]'))).click()
+                sleep(0.2)
+                Clases.append(Clase(text))
+                print(Clases[-1])
+                
 
         # Añadir los datos al archivo de texto
+        Clases.sort(key=lambda x: x.fecha)
         with open(output_file, 'a', encoding='utf-8') as file:
-            # file.write(f'{fecha_completa.strftime("%d/%m/%Y")}\n')
-            for c in clases:
-                file.write(f'{c}\n')
+            for clase in Clases:
+                file.write(str(clase))
 
         print(f"Datos de la semana del {lun_date} añadidos al archivo {output_file}")
 
     except Exception as e:
         print(f"Error: {e}")
+        pass
 
 def descargar():
     url = "https://sies.uniovi.es/serviciosacademicos/web/expedientes/calendario.faces"
@@ -113,7 +100,7 @@ def descargar():
     while texto_actual != texto_final:
         texto_actual = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[3]/h2'))).text
         sleep(1)
-        append_table_to_txt(driver)
+        append_table_to_txt(wait)
         wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="j_id_71:j_id_7e_container"]/div[1]/div[1]/div/button[2]'))).click()
 
 def credentials():
@@ -128,6 +115,28 @@ def credentials():
         print("No se ha encontrado el archivo 'credentials'\nCreandolo...")
         with open('credentials', 'w') as file:
             file.write("user=\npassword=\n")
+
+class Clase:
+    def __init__(self, fecha, hora_ini, hora_fin, aula, asignatura, clase_tipo):
+        self.fecha = fecha
+        self.hora_ini = hora_ini
+        self.hora_fin = hora_fin
+        self.aula = aula
+        self.asignatura = asignatura
+        self.clase_tipo = clase_tipo
+        
+    def __init__(self, text):
+        self.fecha_str = text[2].split(' ')[1]
+        self.fecha = datetime.strptime(self.fecha_str, "%d/%m/%Y")
+        self.hora_ini = text[2].split(' ')[2]
+        self.hora_fin = text[3].split(' ')[2]
+        self.aula = text[1].split(' - ')[1]
+        self.asignatura = text[0].split(' - ')[0]
+        self.clase_tipo = text[0].split(' - ')[1]
+        pass
+    
+    def __str__(self):
+        return f'{self.fecha.strftime("%A")} - {self.fecha.strftime("%d/%m/%Y")}\n({self.hora_ini} - {self.hora_fin})\t{self.asignatura}\n{self.aula}\t{self.clase_tipo}\n\n'
 
 if __name__ == '__main__':
     try:
