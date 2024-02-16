@@ -6,6 +6,14 @@ from time import sleep
 from datetime import datetime, timedelta
 from os import path, remove
 
+dicc_days={
+    'Monday': 'Lunes',
+    'Tuesday': 'Martes',
+    'Wednesday': 'Miércoles',
+    'Thursday': 'Jueves',
+    'Friday': 'Viernes'
+}
+
 def fill_credentials(wait):
     
     sleep(1)
@@ -122,7 +130,7 @@ class Clase:
         pass
     
     def __str__(self):
-        return f'{self.fecha.strftime("%A")} - {self.fecha.strftime("%d/%m/%Y")}\n({self.hora_ini} - {self.hora_fin})\t{self.asignatura}\n{self.aula}\t{self.clase_tipo}\n\n'
+        return f'{dicc_days[self.fecha.strftime("%A")]} - {self.fecha.strftime("%d/%m/%Y")}\n({self.hora_ini} - {self.hora_fin})\t{self.asignatura}\n{self.aula}\t{self.clase_tipo}\n\n'
 
 if __name__ == '__main__':
     try:
