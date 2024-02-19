@@ -120,6 +120,7 @@ class Clase:
 
 def auto_from_txt():
     start = False
+    ret = ''
     lun = datetime.now().date() - timedelta(days=datetime.now().weekday())
     if path.exists('horarioW.txt'):
         remove('horarioW.txt')
@@ -138,8 +139,13 @@ def auto_from_txt():
                 except:
                     pass
             if start:
-                with open('horarioW.txt', 'a', encoding='utf-8') as file:
-                    file.write(line)
+                ret += line
+        
+    with open('horarioW.txt', 'a', encoding='utf-8') as file:
+        file.write(ret)
+    
+    with open('C:\\Users\\juang\\Resilio Sync\\ResilioSync\\horarioW.txt', 'w', encoding='utf-8') as file:
+        file.write(ret)
             
 
 if __name__ == '__main__':
