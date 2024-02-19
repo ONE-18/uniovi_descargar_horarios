@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from datetime import datetime, timedelta
-from os import path, remove
+from os import path, remove, getcwd
 
 def fill_credentials(wait):
     
@@ -124,10 +124,11 @@ def auto_from_txt():
     lun = datetime.now().date() - timedelta(days=datetime.now().weekday())
     if path.exists('horarioW.txt'):
         remove('horarioW.txt')
-    with open('horario.txt', 'r', encoding='utf-8') as file:
+    
+    current_dir = path.dirname(path.realpath(__file__))
+    with open(current_dir+'\\horario.txt', 'r', encoding='utf-8') as file:
         lines = file.readlines()
         for line in lines:
-            # if line != '\n':
             splt = line.split(' - ')
             if len(splt) == 2:
                 try:
@@ -141,11 +142,12 @@ def auto_from_txt():
             if start:
                 ret += line
         
-    with open('horarioW.txt', 'a', encoding='utf-8') as file:
-        file.write(ret)
-    
-    with open('C:\\Users\\juang\\Resilio Sync\\ResilioSync\\horarioW.txt', 'w', encoding='utf-8') as file:
-        file.write(ret)
+    if ret != '':
+        with open('horarioW.txt', 'a', encoding='utf-8') as file:
+            file.write(ret)
+        
+        with open('C:\\Users\\juang\\Resilio Sync\\ResilioSync\\horarioW.txt', 'w', encoding='utf-8') as file:
+            file.write(ret)
             
 
 if __name__ == '__main__':
