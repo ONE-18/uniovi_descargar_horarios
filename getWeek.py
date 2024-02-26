@@ -141,13 +141,27 @@ def auto_from_txt():
                     pass
             if start:
                 ret += line
-        
+
     if ret != '':
+        texto = ''
+        prev = ''
+        ant = ''
+        act= ''
+        for line in ret.strip().split('\n'):
+            if ant == '' or act == '':
+                act = line.split(' - ')[0].strip()
+                if not prev == '' and prev != act:
+                    texto +=('---------------------------------\n\n')
+                prev = act
+            ant = line
+            
+            texto += line+'\n'
+            
         with open('horarioW.txt', 'a', encoding='utf-8') as file:
-            file.write(ret)
+            file.write(texto) 
         
         with open('C:\\Users\\juang\\Resilio Sync\\ResilioSync\\horarioW.txt', 'w', encoding='utf-8') as file:
-            file.write(ret)
+            file.write(texto)
             
 
 if __name__ == '__main__':
